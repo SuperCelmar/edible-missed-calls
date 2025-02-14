@@ -196,22 +196,26 @@ async function isPhoneSupabaseReceivedAlready(phone) {
 
 // Save the phone number to Supabase
 async function savePhoneToSupabase(phone, date, phone_e164) {
-    const url = 'https://zyzfexcextzzhremtkoc.supabase.co/rest/v1/callbackList';
-    const headers = {
-        'apikey': process.env.SUPABASE_API_KEY,
-        'Authorization': 'Bearer ' + process.env.SUPABASE_API_KEY,
-        'Content-Type': 'application/json'
-    };
-    const data = {
-        "phone": phone,
-        "date": date,
-        "status": 'received',
-        "lastUpdated": getCurrentDateISO(),
-        "phone_e164": phone_e164
-    };
-    const response = await axios.post(url, data, { headers });
-    console.log(response.data);
-
+    if (isPhoneSupabaseReceivedAlready(phone) === false) {
+        const url =
+            "https://zyzfexcextzzhremtkoc.supabase.co/rest/v1/callbackList";
+        const headers = {
+            apikey: process.env.SUPABASE_API_KEY,
+            Authorization: "Bearer " + process.env.SUPABASE_API_KEY,
+            "Content-Type": "application/json",
+        };
+        const data = {
+            phone: phone,
+            date: date,
+            status: "received",
+            lastUpdated: getCurrentDateISO(),
+            phone_e164: phone_e164,
+        };
+        const response = await axios.post(url, data, { headers });
+        console.log(response.data);
+    } else {
+        console.log("Phone number already exists in Supabase");
+    }
 }
 // Change status from received to queued, or to called, or to failed
 async function updatePhoneStatus(phone, status, selectedTime) {
